@@ -22,5 +22,12 @@ namespace Pacco.Services.Availability.Api.Controllers
             await _commandDispatcher.SendAsync(command);
             return Created($"resources/{command.ResourceId}", null);
         }
+        
+        [HttpPost("{resourceId}/reservations/{dateTime}")]
+        public async Task<ActionResult> Post(ReserveResource command)
+        {
+            await _commandDispatcher.SendAsync(command);
+            return Ok();
+        }
     }
 }
