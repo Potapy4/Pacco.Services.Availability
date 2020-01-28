@@ -21,7 +21,7 @@ namespace Pacco.Services.Availability.Application.Commands.Handlers
             {
                 throw new ResourceAlreadyExistsException(command.ResourceId);
             }
-
+            
             var resource = Resource.Create(command.ResourceId, command.Tags);
             await _resourcesRepository.AddAsync(resource);
         }
