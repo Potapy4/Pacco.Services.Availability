@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Convey.CQRS.Commands;
 using Pacco.Services.Availability.Application.Exceptions;
