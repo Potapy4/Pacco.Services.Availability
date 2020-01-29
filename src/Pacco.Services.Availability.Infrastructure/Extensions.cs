@@ -3,24 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Convey;
-using Convey.CQRS.Commands;
-using Convey.CQRS.Events;
 using Convey.CQRS.Queries;
+using Convey.Docs.Swagger;
 using Convey.MessageBrokers;
 using Convey.MessageBrokers.CQRS;
 using Convey.MessageBrokers.RabbitMQ;
 using Convey.Persistence.MongoDB;
 using Convey.Persistence.Redis;
 using Convey.WebApi;
+using Convey.WebApi.CQRS;
+using Convey.WebApi.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Pacco.Services.Availability.Application;
 using Pacco.Services.Availability.Application.Events.External;
 using Pacco.Services.Availability.Application.Services;
 using Pacco.Services.Availability.Core.Repositories;
 using Pacco.Services.Availability.Infrastructure.Contexts;
-using Pacco.Services.Availability.Infrastructure.Decorators;
 using Pacco.Services.Availability.Infrastructure.Exceptions;
 using Pacco.Services.Availability.Infrastructure.Logging;
 using Pacco.Services.Availability.Infrastructure.Mongo.Documents;
@@ -49,13 +50,16 @@ namespace Pacco.Services.Availability.Infrastructure
                 .AddRedis()
                 .AddHandlersLogging()
                 .AddMongoRepository<ResourceDocument, Guid>("resources")
-                .AddRabbitMq();
+                .AddRabbitMq()
+                .AddWebApiSwaggerDocs();
         }
 
         public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder app)
         {
             app.UseErrorHandler()
                 .UseConvey()
+                .UseSwaggerDocs()
+                .UsePublicContracts<ContractAttribute>()
                 .UseRabbitMq()
                 .SubscribeEvent<SignedUp>()
                 .SubscribeEvent<CustomerCreated>();

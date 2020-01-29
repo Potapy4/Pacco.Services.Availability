@@ -1,7 +1,5 @@
 using System.Threading.Tasks;
 using Convey.CQRS.Commands;
-using Convey.MessageBrokers;
-using Pacco.Services.Availability.Application.Events;
 using Pacco.Services.Availability.Application.Exceptions;
 using Pacco.Services.Availability.Application.Services;
 using Pacco.Services.Availability.Core.Entities;
