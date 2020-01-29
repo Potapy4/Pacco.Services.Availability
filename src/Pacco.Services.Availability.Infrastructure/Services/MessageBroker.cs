@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Convey.CQRS.Events;
 using Convey.MessageBrokers;
+using Convey.MessageBrokers.Outbox;
 using Convey.MessageBrokers.RabbitMQ;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -18,17 +19,19 @@ namespace Pacco.Services.Availability.Infrastructure.Services
         private readonly ICorrelationContextAccessor _contextAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMessagePropertiesAccessor _messagePropertiesAccessor;
+        private readonly IMessageOutbox _outbox;
         private readonly ILogger<IMessageBroker> _logger;
         private readonly string _spanContextHeader;
 
         public MessageBroker(IBusPublisher busPublisher, ICorrelationContextAccessor contextAccessor,
             IHttpContextAccessor httpContextAccessor, IMessagePropertiesAccessor messagePropertiesAccessor,
-            RabbitMqOptions options, ILogger<IMessageBroker> logger)
+            RabbitMqOptions options, IMessageOutbox outbox, ILogger<IMessageBroker> logger)
         {
             _busPublisher = busPublisher;
             _contextAccessor = contextAccessor;
             _httpContextAccessor = httpContextAccessor;
             _messagePropertiesAccessor = messagePropertiesAccessor;
+            _outbox = outbox;
             _logger = logger;
             _spanContextHeader = string.IsNullOrWhiteSpace(options.SpanContextHeader)
                 ? DefaultSpanContextHeader
@@ -60,6 +63,12 @@ namespace Pacco.Services.Availability.Infrastructure.Services
 
                 var messageId = Guid.NewGuid().ToString("N");
                 _logger.LogTrace($"Publishing integration event: {@event.GetType().Name} [id: '{messageId}'].");
+                if (_outbox.Enabled)
+                {
+                    await _outbox.SendAsync(@event, null, messageId);
+                    continue;
+                }
+                
                 await _busPublisher.PublishAsync(@event, messageId, correlationId, spanContext, correlationContext,
                     headers);
             }
