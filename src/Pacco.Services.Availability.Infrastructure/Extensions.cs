@@ -7,6 +7,7 @@ using Convey.CQRS.Commands;
 using Convey.CQRS.Events;
 using Convey.CQRS.Queries;
 using Convey.Docs.Swagger;
+using Convey.HTTP;
 using Convey.MessageBrokers;
 using Convey.MessageBrokers.CQRS;
 using Convey.MessageBrokers.Outbox;
@@ -22,6 +23,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Pacco.Services.Availability.Application;
+using Pacco.Services.Availability.Application.Commands;
 using Pacco.Services.Availability.Application.Events.External;
 using Pacco.Services.Availability.Application.Services;
 using Pacco.Services.Availability.Core.Repositories;
@@ -55,6 +57,7 @@ namespace Pacco.Services.Availability.Infrastructure
                 .AddExceptionToMessageMapper<ExceptionToMessageMapper>()
                 .AddMongo()
                 .AddRedis()
+                .AddHttpClient()
                 .AddHandlersLogging()
                 .AddMongoRepository<ResourceDocument, Guid>("resources")
                 .AddRabbitMq()
@@ -69,6 +72,8 @@ namespace Pacco.Services.Availability.Infrastructure
                 .UseSwaggerDocs()
                 .UsePublicContracts<ContractAttribute>()
                 .UseRabbitMq()
+                .SubscribeCommand<AddResource>()
+                .SubscribeCommand<ReserveResource>()
                 .SubscribeEvent<SignedUp>()
                 .SubscribeEvent<CustomerCreated>();
 

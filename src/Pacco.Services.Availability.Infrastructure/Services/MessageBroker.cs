@@ -65,7 +65,7 @@ namespace Pacco.Services.Availability.Infrastructure.Services
                 _logger.LogTrace($"Publishing integration event: {@event.GetType().Name} [id: '{messageId}'].");
                 if (_outbox.Enabled)
                 {
-                    await _outbox.SendAsync(@event, null, messageId);
+                    await _outbox.SendAsync(@event, null, messageId, correlationId);
                     continue;
                 }
                 
